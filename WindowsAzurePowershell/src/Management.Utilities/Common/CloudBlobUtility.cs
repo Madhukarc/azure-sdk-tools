@@ -17,6 +17,7 @@ namespace Microsoft.WindowsAzure.Management.Utilities.Common
     using System;
     using System.Globalization;
     using System.IO;
+    using System.Text;
     using ServiceManagement;
     using Storage;
     using Storage.Auth;
@@ -86,6 +87,34 @@ namespace Microsoft.WindowsAzure.Management.Utilities.Common
             return UploadFile(
                 storageName,
                 General.CreateHttpsEndpoint(blobEndpointUri), storageKey, packagePath, blobRequestOptions);
+        }
+
+        public virtual string ReadConfigurationFromBlob(
+            IServiceManagement channel,
+                string storageName,
+                string subscriptionId,
+                Uri configurationFileUri)
+        {
+            var storageService = channel.GetStorageKeys(subscriptionId, storageName);
+            var storageKey = storageService.StorageServiceKeys.Primary;
+            storageService = channel.GetStorageService(subscriptionId, storageName);
+            var blobStorageEndpoint = General.CreateHttpsEndpoint(
+                storageService.StorageServiceProperties.Endpoints.Find(p => p.Contains(BlobEndpointIdentifier)));
+            var credentials = new StorageCredentials(storageName, storageKey);
+            var client = new CloudBlobClient(blobStorageEndpoint, credentials);
+            ICloudBlob blob = client.GetBlobReferenceFromServer(configurationFileUri);
+            StringBuilder configuration = new StringBuilder(string.Empty);
+            using (var stream = blob.OpenRead())
+            {
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    while (!reader.EndOfStream)
+                    {
+                        configuration.Append(reader.ReadLine());
+                    }
+                }
+            }
+            return configuration.ToString();
         }
     }
 }

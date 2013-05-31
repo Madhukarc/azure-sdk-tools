@@ -59,5 +59,14 @@ namespace Microsoft.WindowsAzure.Management.Utilities.Common
         {
             return cloudBlobUtility.UploadFile(storageName, blobEndpointUri, storageKey, filePath, blobRequestOptions);
         }
+
+        public static string ReadConfigurationFromBlob(
+            IServiceManagement channel,
+            string storageName,
+            string subscriptionId,
+            Uri configUri)
+        {
+            return cloudBlobUtility.ReadConfigurationFromBlob(channel, storageName, subscriptionId, configUri);
+        }
     }
 }

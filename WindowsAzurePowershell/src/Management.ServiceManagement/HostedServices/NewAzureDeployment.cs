@@ -129,11 +129,28 @@ namespace Microsoft.WindowsAzure.Management.ServiceManagement.HostedServices
                     this.Package,
                     null));
             }
+
+            var config = string.Empty;
+            if (this.Configuration.StartsWith(Uri.UriSchemeHttp, StringComparison.OrdinalIgnoreCase) ||
+                this.Configuration.StartsWith(Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))
+            {
+
+                config = this.RetryCall(s =>
+                        AzureBlob.ReadConfigurationFromBlob(
+                                this.Channel,
+                                storageName,
+                                s,
+                                new Uri(this.Configuration)));
+            }
+            else
+            {
+                config = General.GetConfiguration(this.Configuration);
+            }
             
             var deploymentInput = new CreateDeploymentInput
             {
                 PackageUrl = packageUrl,
-                Configuration = General.GetConfiguration(this.Configuration),
+                Configuration = config,
                 Label = this.Label,
                 Name = this.Name,
                 StartDeployment = !this.DoNotStart.IsPresent,
