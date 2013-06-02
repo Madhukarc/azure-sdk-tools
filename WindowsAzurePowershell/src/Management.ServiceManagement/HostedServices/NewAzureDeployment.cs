@@ -54,7 +54,7 @@ namespace Microsoft.WindowsAzure.Management.ServiceManagement.HostedServices
             set;
         }
 
-        [Parameter(Position = 2, Mandatory = true,  HelpMessage = "Configuration file path. This parameter should specifiy a .cscfg file on disk.")]
+        [Parameter(Position = 2, Mandatory = true, HelpMessage = "Configuration file path. This parameter specifies the path or URI to a .cscfg file in blob storage. The storage account must belong to the same subscription as the deployment.")]
         [ValidateNotNullOrEmpty]
         public string Configuration
         {
